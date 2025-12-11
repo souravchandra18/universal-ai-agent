@@ -6,6 +6,7 @@ import javax.swing.SwingUtilities;
 
 public class CurrencyConverter {
     public static void main(String[] args) {
+        System.out.println("Entering into the main methoe");
         SwingUtilities.invokeLater(UI::new);
     }
 }
