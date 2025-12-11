@@ -30,7 +30,7 @@ RUN curl -sSfL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scrip
 ENV PATH="$PATH:$HOME/.tfsec/bin"
 
 # Copy the action code
-COPY .github/actions/ai-agent /app
+COPY . /app
 WORKDIR /app
 
 # Set entrypoint
