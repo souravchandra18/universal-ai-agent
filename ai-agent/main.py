@@ -5,23 +5,27 @@ from github import Github, Auth
 import json
 
 def run_agent():
+    # Read environment variables
     llm_provider = os.getenv('INPUT_LLM_PROVIDER', 'openai')
     run_semgrep = os.getenv('INPUT_RUN_SEMGREP', 'true').lower() == 'true'
-    github_token = os.getenv('VAULT_TOKEN')
+    github_token = os.getenv('GITHUB_TOKEN')  # ✅ switched from VAULT_TOKEN
 
     repo_root = os.getenv('GITHUB_WORKSPACE', os.getcwd())
     print(f"Repo root: {repo_root}")
 
+    # Detect languages and tools
     detected = detect_languages_and_tools(repo_root)
     print(f"Detected languages/tools: {detected}")
 
+    # Run analyzers
     analyzer_results = run_analyzers(repo_root, detected, run_semgrep)
 
+    # Build prompt for LLM
     prompt = build_prompt(detected, analyzer_results)
     llm_response = call_llm(provider=llm_provider, prompt=prompt)
 
+    # Report results back to GitHub
     if github_token and os.getenv('GITHUB_REPOSITORY') and os.getenv('GITHUB_SHA'):
-        #g = Github(github_token)
         g = Github(auth=Auth.Token(github_token))
         repo = g.get_repo(os.getenv('GITHUB_REPOSITORY'))
         sha = os.getenv('GITHUB_SHA')
@@ -43,9 +47,12 @@ def run_agent():
         event_name = os.getenv('GITHUB_EVENT_NAME', '')
         if 'pull_request' in event_name:
             ref = os.getenv('GITHUB_REF', '')
-            pr_number = int(ref.split('/')[-1])
-            pr = repo.get_pull(pr_number)
-            pr.create_issue_comment(llm_response.get('summary', 'AI Agent completed analysis'))
+            try:
+                pr_number = int(ref.split('/')[-1])
+                pr = repo.get_pull(pr_number)
+                pr.create_issue_comment(llm_response.get('summary', 'AI Agent completed analysis'))
+            except Exception as e:
+                print(f"Failed to post PR comment: {e}")
 
     print('AI Agent finished.')
 
