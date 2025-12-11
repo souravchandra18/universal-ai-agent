@@ -24,10 +24,12 @@ jobs:
       - name: Install analyzers
         run: |
           python -m pip install --upgrade pip
-          pip install ruff bandit semgrep PyGithub checkov tfsec
+          pip install ruff bandit semgrep PyGithub checkov
           npm install -g eslint
           gem install rubocop brakeman
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          echo "$HOME/.tfsec/bin" >> $GITHUB_PATH
 
       - name: Run AI Universal Agent
         uses: ./.github/actions/ai-agent
