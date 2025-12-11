@@ -24,7 +24,7 @@ def run_agent():
     prompt = build_prompt(detected, analyzer_results)
     llm_response = call_llm(provider=llm_provider, prompt=prompt)
 
-    # Post PR comment only (skip check runs)
+    # Post PR comment with both summary and full report
     event_name = os.getenv('GITHUB_EVENT_NAME', '')
     event_path = os.getenv('GITHUB_EVENT_PATH', '')
 
@@ -38,10 +38,16 @@ def run_agent():
                 event = json.load(f)
             pr_number = event['pull_request']['number']  # ✅ safe extraction
             pr = repo.get_pull(pr_number)
-            pr.create_issue_comment(
-                llm_response.get('summary', 'AI Agent completed analysis')
+
+            # Combine summary and full report
+            comment_body = (
+                f"### Repository Health Summary\n{llm_response.get('summary', '')}\n\n"
+                f"---\n\n"
+                f"### Detailed Report\n{llm_response.get('full', json.dumps(analyzer_results, indent=2))}"
             )
-            print(f"Posted AI Agent summary as PR comment on PR #{pr_number}.")
+
+            pr.create_issue_comment(comment_body)
+            print(f"Posted AI Agent summary and full report as PR comment on PR #{pr_number}.")
         except Exception as e:
             print(f"Failed to post PR comment: {e}")
 
