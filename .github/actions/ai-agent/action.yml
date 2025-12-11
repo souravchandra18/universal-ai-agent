@@ -1,8 +1,8 @@
 name: "AI Universal Agent (Python)"
 description: "Runs language-agnostic code review, security scanning, and SRE checks using Python"
 runs:
-  using: "python"
-  main: "main.py"
+  using: "docker"
+  image: "Dockerfile"
 inputs:
   llm_provider:
     description: 'LLM provider (openai | bedrock | custom)'
