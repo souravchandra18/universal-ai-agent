@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
       pull-requests: write
 
     steps:
@@ -47,34 +48,9 @@ jobs:
           echo "/root/.tfsec/bin" >> $GITHUB_PATH
 
       - name: Run AI Universal Agent
-        id: ai_agent
-        run: |
-          python3 ai-agent/main.py > report.txt
+        run: python3 ai-agent/main.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.VAULT_TOKEN }}
           INPUT_LLM_PROVIDER: 'openai'
           INPUT_RUN_SEMGREP: 'true'
-
-      - name: Send report via email
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "AI Agent Report for ${{ github.repository }}"
-          to: "sourav.chandra.cse16@gmail.com"
-          from: "souravchandra696@gmail.com"
-          body: |
-            Hello Team,
-
-            The AI Universal Agent has completed its analysis for PR #${{ github.event.pull_request.number }}.
-
-            Please find the full report below:
-
-            ${{ steps.ai_agent.outputs }}
-
-            ---
-            GitHub Repository: ${{ github.repository }}
-            Commit SHA: ${{ github.sha }}
