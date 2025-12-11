@@ -1,0 +1,38 @@
+name: AI Universal Agent CI
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ai_review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install analyzers
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff bandit semgrep PyGithub checkov tfsec
+          npm install -g eslint
+          gem install rubocop brakeman
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run AI Universal Agent
+        uses: ./.github/actions/ai-agent
+        with:
+          llm_provider: 'openai'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.VAULT_TOKEN }}
