@@ -1,4 +1,5 @@
 name: AI Universal Agent CI
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -10,8 +11,9 @@ jobs:
       contents: read
       checks: write
       pull-requests: write
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -21,18 +23,34 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install analyzers
+      - name: Install system dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install ruff bandit semgrep PyGithub checkov tfsec
-          npm install -g eslint
-          gem install rubocop brakeman
+          sudo apt-get update
+          sudo apt-get install -y curl git npm ruby-full openjdk-11-jdk
+
+      - name: Install Python analyzers
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r ai-agent/requirements.txt
+
+      - name: Install Node.js analyzers
+        run: npm install -g eslint
+
+      - name: Install Ruby analyzers
+        run: |
+          gem install --user-install rubocop brakeman
+          echo "$(ruby -e 'puts Gem.user_dir')/bin" >> $GITHUB_PATH
+
+      - name: Install security tools
+        run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          echo "/root/.tfsec/bin" >> $GITHUB_PATH
 
       - name: Run AI Universal Agent
-        uses: ./.github/actions/ai-agent
-        with:
-          llm_provider: 'openai'
+        run: python3 ai-agent/main.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.VAULT_TOKEN }}
+          INPUT_LLM_PROVIDER: 'openai'
+          INPUT_RUN_SEMGREP: 'true'
