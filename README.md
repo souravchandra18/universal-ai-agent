@@ -1,34 +1,27 @@
+# AI Universal Agent
 
-# Currency Converter
+**AI Universal Agent** is a GitHub Actions bot that combines **multi‑language static analysis** with **LLM‑powered summarization** to deliver actionable pull request reviews. Instead of just failing builds or dumping analyzer logs, it acts like a **reviewer**: detecting issues, prioritizing fixes, and posting clear, structured feedback directly into your PRs.
 
-## Overview
+---
 
-This is a currency converter that allows users to convert between different currencies. It fetches live exchange rates and performs conversions based on the selected currencies
-using rate data from [ExchangeRate-API](https://www.exchangerate-api.com)
+## 🚀 What It Does
+- **Detects languages & tools** in your repository (Java, Python, JavaScript, Ruby, Go, PHP, .NET, Docker, Terraform, Kubernetes).
+- **Runs analyzers & security scanners** (Ruff, ESLint, Bandit, SpotBugs, PMD, Trivy, tfsec, Semgrep, and more).
+- **Summarizes results with AI** into:
+  - A repository health overview
+  - A prioritized list of fixes with severity and suggested commands
+  - Line‑level suggestions when available
+- **Posts feedback directly in GitHub PRs** as comments — no extra dashboards or tools required.
 
-โปรแกรมสำหรับการแปลงสกุลเงินต่างประเทศด้วยการดีไซน์ระบบตำบลอย่างมินิมอล :> 
+---
 
-ใช้ข้อมูลอัตราการแลกเปลี่ยนจาก [ExchangeRate-API](https://www.exchangerate-api.com)
+## 🎯 Why It’s Different
+- **Novel integration**: Traditional CI analyzers + AI summarization in one workflow.
+- **Universal**: Works across multiple languages and infrastructure stacks.
+- **Actionable**: Converts noisy logs into clear, prioritized recommendations.
+- **Seamless**: Feedback appears right in the PR conversation, where developers need it.
 
-## Requirements
+---
 
-- **JDK 23 or higher** is required to run this program
-
-If you don’t have JDK 23 installed, download and install it from the following link:
-
-- [JDK 23 Download](https://jdk.java.net/23/)
-
-ใช้ JDK 23+ ขึ้นไปในการรันโปรแกรม ถ้ายังไม่มีให้โหลดจาก link ข้างบน
-
-## Usage
-
-To run the Converter, you need to define your API KEY in [config.properties](src/main/resources/config.properties) and run the [CurrencyConverter.java](src/main/java/com/github/blaxk3/converter)
-You can get free key from the above mentioned websites
-
-สำหรับผู้ที่จะใช้งาน ให้ใส่ API KEY ของตัวเองใน [config.properties](src/main/resources/config.properties) และรันไฟล์ [CurrencyConverter.java](src/main/java/com/github/blaxk3/converter)
-
-รับ key ได้ฟรีจากเว็บไซต์ที่ได้กล่าวไปข้างต้น
-
-## License
-
-This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute the code as per the terms of the license
+## 🧠 One‑liner Pitch
+> *AI Universal Agent: a GitHub Actions bot that reviews pull requests with static analyzers and LLMs, delivering actionable insights across any language.*
