@@ -8,7 +8,7 @@ def run_agent():
     # Read environment variables
     llm_provider = os.getenv('INPUT_LLM_PROVIDER', 'openai')
     run_semgrep = os.getenv('INPUT_RUN_SEMGREP', 'true').lower() == 'true'
-    github_token = os.getenv('GITHUB_TOKEN')  # ✅ switched from VAULT_TOKEN
+    github_token = os.getenv('GITHUB_TOKEN')  # ✅ using GITHUB_TOKEN
 
     repo_root = os.getenv('GITHUB_WORKSPACE', os.getcwd())
     print(f"Repo root: {repo_root}")
@@ -24,33 +24,21 @@ def run_agent():
     prompt = build_prompt(detected, analyzer_results)
     llm_response = call_llm(provider=llm_provider, prompt=prompt)
 
-    # Report results back to GitHub
-    if github_token and os.getenv('GITHUB_REPOSITORY') and os.getenv('GITHUB_SHA'):
+    # Post PR comment only (skip check runs)
+    if github_token and os.getenv('GITHUB_REPOSITORY'):
         g = Github(auth=Auth.Token(github_token))
         repo = g.get_repo(os.getenv('GITHUB_REPOSITORY'))
-        sha = os.getenv('GITHUB_SHA')
 
-        # Create a check run
-        repo.create_check_run(
-            name='AI Universal Agent',
-            head_sha=sha,
-            status='completed',
-            conclusion='neutral',
-            output={
-                'title': 'AI Agent Report',
-                'summary': llm_response.get('summary', 'See details'),
-                'text': llm_response.get('full', json.dumps(analyzer_results, indent=2))
-            }
-        )
-
-        # Post PR comment if applicable
         event_name = os.getenv('GITHUB_EVENT_NAME', '')
         if 'pull_request' in event_name:
             ref = os.getenv('GITHUB_REF', '')
             try:
                 pr_number = int(ref.split('/')[-1])
                 pr = repo.get_pull(pr_number)
-                pr.create_issue_comment(llm_response.get('summary', 'AI Agent completed analysis'))
+                pr.create_issue_comment(
+                    llm_response.get('summary', 'AI Agent completed analysis')
+                )
+                print("Posted AI Agent summary as PR comment.")
             except Exception as e:
                 print(f"Failed to post PR comment: {e}")
 
