@@ -25,22 +25,25 @@ def run_agent():
     llm_response = call_llm(provider=llm_provider, prompt=prompt)
 
     # Post PR comment only (skip check runs)
-    if github_token and os.getenv('GITHUB_REPOSITORY'):
+    event_name = os.getenv('GITHUB_EVENT_NAME', '')
+    event_path = os.getenv('GITHUB_EVENT_PATH', '')
+
+    if github_token and os.getenv('GITHUB_REPOSITORY') and 'pull_request' in event_name and event_path:
         g = Github(auth=Auth.Token(github_token))
         repo = g.get_repo(os.getenv('GITHUB_REPOSITORY'))
 
-        event_name = os.getenv('GITHUB_EVENT_NAME', '')
-        if 'pull_request' in event_name:
-            ref = os.getenv('GITHUB_REF', '')
-            try:
-                pr_number = int(ref.split('/')[-1])
-                pr = repo.get_pull(pr_number)
-                pr.create_issue_comment(
-                    llm_response.get('summary', 'AI Agent completed analysis')
-                )
-                print("Posted AI Agent summary as PR comment.")
-            except Exception as e:
-                print(f"Failed to post PR comment: {e}")
+        try:
+            # Load event payload JSON to get PR number
+            with open(event_path, 'r') as f:
+                event = json.load(f)
+            pr_number = event['pull_request']['number']  # ✅ safe extraction
+            pr = repo.get_pull(pr_number)
+            pr.create_issue_comment(
+                llm_response.get('summary', 'AI Agent completed analysis')
+            )
+            print(f"Posted AI Agent summary as PR comment on PR #{pr_number}.")
+        except Exception as e:
+            print(f"Failed to post PR comment: {e}")
 
     print('AI Agent finished.')
 
