@@ -1,7 +1,7 @@
 import os
 from analyzers import detect_languages_and_tools, run_analyzers
 from llm import call_llm
-from github import Github
+from github import Github, Auth
 import json
 
 def run_agent():
@@ -21,7 +21,8 @@ def run_agent():
     llm_response = call_llm(provider=llm_provider, prompt=prompt)
 
     if github_token and os.getenv('GITHUB_REPOSITORY') and os.getenv('GITHUB_SHA'):
-        g = Github(github_token)
+        #g = Github(github_token)
+        g = Github(auth=Auth.Token(github_token))
         repo = g.get_repo(os.getenv('GITHUB_REPOSITORY'))
         sha = os.getenv('GITHUB_SHA')
 
