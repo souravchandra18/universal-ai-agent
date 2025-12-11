@@ -7,7 +7,7 @@ import json
 def run_agent():
     llm_provider = os.getenv('INPUT_LLM_PROVIDER', 'openai')
     run_semgrep = os.getenv('INPUT_RUN_SEMGREP', 'true').lower() == 'true'
-    github_token = os.getenv('GITHUB_TOKEN')
+    github_token = os.getenv('VAULT_TOKEN')
 
     repo_root = os.getenv('GITHUB_WORKSPACE', os.getcwd())
     print(f"Repo root: {repo_root}")
