@@ -26,7 +26,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff bandit semgrep PyGithub checkov
           npm install -g eslint
-          gem install rubocop brakeman
+          gem install --user-install rubocop brakeman
+          echo "$(ruby -e 'puts Gem.user_dir')/bin" >> $GITHUB_PATH
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
           curl -sSfL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
           echo "$HOME/.tfsec/bin" >> $GITHUB_PATH
