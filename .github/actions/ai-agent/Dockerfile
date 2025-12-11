@@ -1,12 +1,13 @@
-# Base image with Python 3.11 and OpenJDK 11 preinstalled
-FROM openjdk:11-jdk-slim
+# Base image with Python 3.11
+FROM python:3.11-slim
 
-# Install system dependencies
+# Install system dependencies + OpenJDK 11
 RUN apt-get update && apt-get install -y \
     curl \
     git \
     npm \
     ruby-full \
+    openjdk-11-jdk \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages
