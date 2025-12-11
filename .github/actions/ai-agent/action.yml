@@ -1,0 +1,17 @@
+name: "AI Universal Agent (Python)"
+description: "Runs language-agnostic code review, security scanning, and SRE checks using Python"
+runs:
+  using: "python"
+  main: "main.py"
+inputs:
+  llm_provider:
+    description: 'LLM provider (openai | bedrock | custom)'
+    required: false
+    default: 'openai'
+  run_semgrep:
+    description: 'Enable semgrep scans (true/false)'
+    required: false
+    default: 'true'
+branding:
+  icon: robot
+  color: blue
